@@ -50,3 +50,5 @@ pkg
 
 log/*
 ./config/server.yml
+tmp/pids
+tmp/sockets

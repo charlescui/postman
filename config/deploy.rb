@@ -40,6 +40,7 @@ end
 after 'deploy:update_code' do
   softlinks = [
     "rm -rf #{release_path}/tmp/sockets;ln -nfs #{deploy_to}/shared/sockets #{release_path}/tmp/sockets",
+    "rm -rf #{release_path}/tmp/pids;ln -nfs #{deploy_to}/shared/pids #{release_path}/tmp/pids",
     "rm -rf #{release_path}/config/server.yml;ln -nfs #{deploy_to}/shared/system/server.yml #{release_path}/config/server.yml"
     ]
   run "#{softlinks.join(';')}"
