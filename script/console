@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require 'ruby-debug'
+APP_PATH = File.expand_path('../..',  __FILE__)
+require File.join(APP_PATH, 'lib/postman')
+
+require 'irb'
+require 'irb/completion'
+
+require 'ruby-debug' if Postman.env == 'development'
+
+IRB.start

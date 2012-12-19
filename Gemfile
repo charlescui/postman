@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source "http://ruby.taobao.org"
 # Add dependencies required to use your gem here.
 # Example:
 #   gem "activesupport", ">= 2.3.5"
@@ -6,9 +6,27 @@ source "http://rubygems.org"
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
+  gem "better_errors"
+  gem "binding_of_caller"
   gem "shoulda", ">= 0"
   gem "rdoc", "~> 3.12"
-  gem "bundler", "~> 1.0.0"
+  gem "bundler", "> 1.0.0"
   gem "jeweler", "~> 1.8.4"
-  gem "rcov", ">= 0"
+  gem "simplecov"
+  gem 'linecache19', :git => 'git://github.com/mark-moseley/linecache'
+  gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
+  gem 'ruby-debug19'
 end
+
+group :production do
+  
+end
+
+gem "thin"
+gem "amqp"
+gem "json"
+gem 'uuid'
+gem "redis"
+gem "hiredis"
+gem "sinatra"
+gem "eventmachine"
