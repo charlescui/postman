@@ -22,7 +22,7 @@ module Postman
 					end
 				end#pub
 
-				get '/sub' do
+				get '/ck/sub' do
 					stream :keep_open do |out|
 						AMQP::Channel.new(::P::C.amqp) do |channel, open_ok|
 							AMQP::Queue.new(channel, params[:key], :auto_delete => true, :durable => true) do |queue|
@@ -32,7 +32,19 @@ module Postman
 							end
 						end
 					end
-				end#sub
+				end#/ck/sub
+
+				get '/lp/sub' do
+					stream do |out|
+						AMQP::Channel.new(::P::C.amqp) do |channel, open_ok|
+							AMQP::Queue.new(channel, params[:key], :auto_delete => true, :durable => true) do |queue|
+								queue.subscribe do |payload|
+									out << payload
+								end
+							end
+						end
+					end
+				end#/lp/sub
 			end
 		end
 	end
