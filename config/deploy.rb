@@ -1,3 +1,9 @@
+require 'rvm/capistrano'
+require "bundler/capistrano"
+
+set :rvm_ruby_string, '1.9.3'
+set :rvm_type, :user
+
 set :application, "postman"
 
 set :repository, "."
@@ -26,14 +32,14 @@ ssh_options[:port] = 27788
 
 namespace :deploy do
   task :start, :roles => :app do
-    run "cd #{current_path};bundle exec thin start -p 8000 -e production"
+    run "cd #{current_path};bundle exec thin start -s5 -p 8000 -e production"
   end
   desc "Reload"
   task :restart, :roles => :app do   
-	run "cd #{current_path};bundle exec thin restart -e production"
+	run "cd #{current_path};bundle exec thin restart -s5 -p 8000 -e production"
   end
   task :stop, :roles => :app do   
-    run "cd #{current_path};bundle exec thin stop -e production"
+    run "cd #{current_path};bundle exec thin stop -s5 -p 8000 -e production"
   end
 end
 

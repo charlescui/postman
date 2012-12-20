@@ -2,7 +2,6 @@ $:.unshift File.dirname(__FILE__)
 
 require "amqp"
 require "sinatra/base"
-require "better_errors"
 require_relative "postman/configration"
 require "active_support"
 require 'active_support/core_ext/string/inflections'

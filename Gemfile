@@ -6,7 +6,6 @@ source "http://ruby.taobao.org"
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
-  gem "better_errors"
   gem "binding_of_caller"
   gem "shoulda", ">= 0"
   gem "rdoc", "~> 3.12"
@@ -29,4 +28,6 @@ gem 'uuid'
 gem "redis"
 gem "hiredis"
 gem "sinatra"
+gem "better_errors"
 gem "eventmachine"
+gem "activesupport"

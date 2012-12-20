@@ -1,6 +1,9 @@
 require "pp"
+require "better_errors"
 require "./lib/postman"
-require "ruby-debug" if Postman.env == 'development'
+if Postman.env == 'development'
+	require "ruby-debug"
+end
 
 pp ::Postman::App::Controller.controllers_url_map
 

@@ -96,6 +96,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   amqp
   better_errors
   binding_of_caller
