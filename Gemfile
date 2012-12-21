@@ -26,6 +26,7 @@ gem "amqp"
 gem "json"
 gem 'uuid'
 gem "redis"
+gem 'virtus'
 gem "hiredis"
 gem "sinatra"
 gem "better_errors"

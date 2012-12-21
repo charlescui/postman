@@ -1,3 +1,6 @@
+require "redis"
+require "amqp"
+
 module Postman
 	module Configration
 		class << self

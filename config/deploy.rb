@@ -32,14 +32,14 @@ ssh_options[:port] = 27788
 
 namespace :deploy do
   task :start, :roles => :app do
-    run "cd #{current_path};bundle exec thin start -s5 -p 8000 -e production"
+    run "cd #{current_path};bundle exec thin start -s5 -p 8000 -e production -l log/production.log -t 3600"
   end
   desc "Reload"
   task :restart, :roles => :app do   
-	run "cd #{current_path};bundle exec thin restart -s5 -p 8000 -e production"
+	run "cd #{current_path};bundle exec thin restart -s5 -p 8000 -e production -l log/production.log -t 3600"
   end
   task :stop, :roles => :app do   
-    run "cd #{current_path};bundle exec thin stop -s5 -p 8000 -e production"
+    run "cd #{current_path};bundle exec thin stop -s5 -p 8000 -e production -l log/production.log -t 3600"
   end
 end
 
