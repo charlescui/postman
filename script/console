@@ -3,6 +3,9 @@ require 'ruby-debug'
 APP_PATH = File.expand_path('../..',  __FILE__)
 require File.join(APP_PATH, 'lib/postman')
 
+include Postman::App::Controller
+include Postman::App::Model
+
 require 'irb'
 require 'irb/completion'
 

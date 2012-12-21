@@ -3,10 +3,14 @@ $:.unshift File.dirname(__FILE__)
 require "uuid"
 require 'ostruct'
 require "sinatra/base"
+require "sinatra/reloader"
+require "better_errors"
 require_relative "postman/configration"
 require "active_support"
 require 'active_support/core_ext/string/inflections'
 require "active_support/core_ext/object/blank"
+
+EM.epoll
 
 Dir[File.join(File.dirname(__FILE__), 'postman', 'app', 'model', '*.rb')].each{|file| require_relative file}
 
@@ -37,6 +41,8 @@ module Postman
 				end
 
 				helpers do
+					# 用户鉴权
+					# 将用户数据保存在redis的hash结构中
 					def current_user
 						obj = ::P::C.redis.hgetall(params[:user_credentials])
 						if !obj.blank?
@@ -59,7 +65,17 @@ module Postman
 				end
 
 				dir = File.dirname(File.expand_path(__FILE__))
+				# 设置视图文件目录
     			BASEVIEWPATH = "#{dir}/postman/app/view"
+    			set :views, BASEVIEWPATH
+    			set :layout, File.join(BASEVIEWPATH, 'layout.erb')
+
+    			# 重定义erb模板方法，默认带上全局统一的模板文件
+    			alias :raw_erb :erb
+    			def erb(template, options={}, locals={})
+    				options = {:layout => (@@_layout ||= IO.read(settings.layout))}.merge options
+    				raw_erb(template, options, locals)
+    			end
 				
 				if respond_to? :public_folder
 					set :public_folder, "../#{dir}/public"
@@ -73,30 +89,18 @@ module Postman
 			    end
 
 			    configure :development do
+			    	register Sinatra::Reloader
+			    	also_reload __FILE__
 					use BetterErrors::Middleware
 					BetterErrors.application_root = File.expand_path("..", __FILE__)
 			    end
 
 			    not_found do
-					<<-DOC
-						    _   __      __     _____                              __     ___    ____  ____
-						   / | / /___  / /_   / ___/__  ______  ____  ____  _____/ /_   /   |  / __ \/  _/
-						  /  |/ / __ \/ __/   \__ \/ / / / __ \/ __ \/ __ \/ ___/ __/  / /| | / /_/ // /  
-						 / /|  / /_/ / /_    ___/ / /_/ / /_/ / /_/ / /_/ / /  / /_   / ___ |/ ____// /   
-						/_/ |_/\____/\__/   /____/\__,_/ .___/ .___/\____/_/   \__/  /_/  |_/_/   /___/   
-						                              /_/   /_/                                           
-					DOC
+					erb :"404", :views => BASEVIEWPATH
 				end
 
 				error do
-			    	<<-DOC
-		    			    ______                        _          _____                          
-		    			   / ____/_____________  _____   (_)___     / ___/___  ______   _____  _____
-		    			  / __/ / ___/ ___/ __ \/ ___/  / / __ \    \__ \/ _ \/ ___/ | / / _ \/ ___/
-		    			 / /___/ /  / /  / /_/ / /     / / / / /   ___/ /  __/ /   | |/ /  __/ /    
-		    			/_____/_/  /_/   \____/_/     /_/_/ /_/   /____/\___/_/    |___/\___/_/     
-		    			                                                                            
-			    	DOC
+			    	erb :"500", :views => BASEVIEWPATH
 				end
 			end#ApplicationController
 		end#Controller
