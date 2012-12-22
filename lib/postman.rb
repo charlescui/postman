@@ -10,7 +10,13 @@ require "active_support"
 require 'active_support/core_ext/string/inflections'
 require "active_support/core_ext/object/blank"
 
-EM.epoll
+begin
+	gem 'eventmachine'
+	EM.epoll
+	EM.threadpool_size = ::P::C.config[:threads] || 50
+rescue Exception => e
+	# do nothing
+end
 
 Dir[File.join(File.dirname(__FILE__), 'postman', 'app', 'model', '*.rb')].each{|file| require_relative file}
 
