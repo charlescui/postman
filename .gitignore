@@ -52,3 +52,4 @@ log/*
 ./config/server.yml
 tmp/pids
 tmp/sockets
+.DS_Store

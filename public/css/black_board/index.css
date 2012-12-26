@@ -1,0 +1,56 @@
+body{
+	margin: 0 auto;
+}
+
+.wall{
+	/*border: 1px solid;*/
+	margin: 0px auto;
+	width: 1000px;
+	height: 710px;
+	background-image: url(/img/room.jpg);
+}
+/*标语*/
+.title{
+	position: relative;
+	top: 90px;
+	text-align: center;
+	height: 90px;
+	margin: 5px 177px 0px 177px;
+}
+.left{
+	float: left;
+}
+.right{
+	float: right;
+}
+.tip{
+	margin: 5px 5px 5px 10px;
+	float: left;
+	height: 64px;
+	font-size: 53px;
+	color: #000000;
+	/*background-image: url('/img/kuang65.png');*/
+	background-repeat: no-repeat;
+}
+.blackboard{
+	position: relative;
+	left: 70px;
+	top: 75px;
+	width: 830px;
+	height: 250px;
+	margin-top: 3px;
+	padding-left: 10px;
+	padding-right: 10px;
+	overflow-y:scroll;
+	/*background-image: url("/img/bb_bg.png");*/
+}
+#board{
+	font-size: 18px;
+	color: #ffffff;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow: auto;
+}
+
+
+.clearfix { display: inline-block; }

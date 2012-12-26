@@ -1,0 +1,23 @@
+<pre id='chat'></pre>
+
+<script>
+  if(typeof(EventSource)!=="undefined"){
+    // reading
+    var es = new EventSource('/mc/ck/sub?key=chat_room');
+    es.onmessage = function(e) { $('#chat').append(e.data + "\n") };
+
+    // writing
+    $("form").live("submit", function(e) {
+      $.post('/mc/pub', {content: '<%= user %> : '+$('#msg').val()+'\r\n', key: "chat_room"});
+      $('#msg').val(''); $('#msg').focus();
+      e.preventDefault();
+    });
+  }else{
+    $('#chat').append("Whoops!Your browser doesn't receive server-sent events.");
+  }
+  
+</script>
+
+<form>
+  <input id='msg' placeholder='type message here...' />
+</form>

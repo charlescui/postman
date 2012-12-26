@@ -1,0 +1,32 @@
+<div class='wall'>
+  <div class='title'>
+    <div class='left'>
+      <div class='tip'>好</div>
+      <div class='tip'>好</div>
+      <div class='tip'>学</div>
+      <div class='tip'>习</div>
+    </div>
+    <div class='right'>
+      <div class='tip'>天</div>
+      <div class='tip'>天</div>
+      <div class='tip'>向</div>
+      <div class='tip'>上</div>
+    </div>
+    <div class='clearfix'></div>
+  </div>
+  <div class='blackboard'>
+    <pre id='board'>
+    </pre>
+  </div>
+</div>
+
+<script>
+  if(typeof(EventSource)!=="undefined"){
+    // reading
+    var es = new EventSource('/mc/ck/sub?key=siri_bb');
+    es.onmessage = function(e) { $('#board').append(e.data) };
+  }else{
+    $('#chat').append("Whoops!Your browser doesn't receive server-sent events.");
+  }
+  
+</script>

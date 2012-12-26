@@ -84,9 +84,9 @@ module Postman
     			end
 				
 				if respond_to? :public_folder
-					set :public_folder, "../#{dir}/public"
+					set :public_folder, "#{dir}/../public"
 				else
-					set :public, "../#{dir}/public"
+					set :public, "#{dir}/../public"
 				end
 				set :static, true
 
