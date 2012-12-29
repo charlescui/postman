@@ -33,3 +33,4 @@ gem "better_errors"
 gem "eventmachine"
 gem "activesupport"
 gem 'sinatra-contrib'
+gem 'sinatra-websocket'

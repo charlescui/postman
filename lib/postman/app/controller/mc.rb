@@ -1,3 +1,5 @@
+require 'sinatra-websocket'
+
 class String
 	# 如果请求是eventsource协议，则返回的内容应该为
 	# data: payload\n\n
@@ -105,6 +107,36 @@ module Postman
 						end
 					end
 				end#/lp/sub
+
+				# WebScoket模式
+				get '/websocket' do
+					halt not_found if !request.websocket?
+					user = current_user
+					request.websocket do |ws|
+						ws.onopen do
+							AMQP::Channel.new(::P::C.amqp) do |channel, open_ok|
+								@exchange = channel.fanout(exchange_name(user))
+								@queue_name = uuid_queue_name(user)
+								AMQP::Queue.new(channel, @queue_name, :auto_delete => true, :durable => true, :arguments => { "x-message-ttl" => user.ttl }) do |queue|
+									@queue = queue
+									@queue.bind(@exchange).subscribe do |payload|
+										ws.send(payload)
+									end
+								end
+							end
+						end
+						ws.onmessage do |msg|
+							EM.next_tick { 
+								if @exchange
+									@exchange.publish msg, :routing_key => routing_key(user), :mandatory => false
+								end
+							}
+						end
+						ws.onclose do
+							@queue.delete if @queue
+						end
+					end
+				end#websocket
 			end#mc
 		end#controller
 	end#app
