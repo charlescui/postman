@@ -68,6 +68,13 @@ module Postman
 							raise "No user found!!!"
 						end
 					end
+
+	    			# 重定义erb模板方法，默认带上全局统一的模板文件
+	    			# alias :raw_erb :erb
+	    			def perb(template, options={}, locals={})
+	    				options = {:layout => (@@_layout ||= IO.read(settings.layout))}.merge options
+	    				erb(template, options, locals)
+	    			end
 				end
 
 				dir = File.dirname(File.expand_path(__FILE__))
@@ -75,13 +82,6 @@ module Postman
     			BASEVIEWPATH = "#{dir}/postman/app/view"
     			set :views, BASEVIEWPATH
     			set :layout, File.join(BASEVIEWPATH, 'layout.erb')
-
-    			# 重定义erb模板方法，默认带上全局统一的模板文件
-    			alias :raw_erb :erb
-    			def erb(template, options={}, locals={})
-    				options = {:layout => (@@_layout ||= IO.read(settings.layout))}.merge options
-    				raw_erb(template, options, locals)
-    			end
 				
 				if respond_to? :public_folder
 					set :public_folder, "#{dir}/../public"
@@ -102,11 +102,11 @@ module Postman
 			    end
 
 			    not_found do
-					erb :"404", :views => BASEVIEWPATH
+					perb :"404", :views => BASEVIEWPATH
 				end
 
 				error do
-			    	erb :"500", :views => BASEVIEWPATH
+			    	perb :"500", :views => BASEVIEWPATH
 				end
 			end#ApplicationController
 		end#Controller

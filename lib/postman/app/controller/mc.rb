@@ -31,7 +31,7 @@ module Postman
 					end
 
 					def is_event_source
-						request.env['sinatra.accept'].include?("text/event-stream")
+						request.env['sinatra.accept'] && request.env['sinatra.accept'].include?("text/event-stream")
 					end
 				end
 
@@ -41,7 +41,7 @@ module Postman
 					"message center."
 				end
 
-				post '/pub' do
+				get '/pub' do
 					stream :keep_open do |out|
 						user = current_user
 						AMQP::Channel.new(::P::C.amqp) do |channel, open_ok|
@@ -59,7 +59,35 @@ module Postman
 				end#pub
 
 				# Chunk模式
-				get '/ck/sub', :provides => 'text/event-stream' do
+				# 如果约束是event-source协议，
+				# 则需要在路由后面加上约束条件 :provides => 'text/event-stream'
+
+				# 当API访问这个订阅接口时，
+				# 可以使用支持chunk方式的http client库
+				# 比如em-http-request
+				# 下面这个例子是客户端维持一个chunk的长连接
+				# 支持断线重连
+
+				# require 'em-http-request'
+
+				# def request_persistent(&blk)
+				# 	http = EventMachine::HttpRequest.new('http://localhost:9999/mc/ck/sub?key=abc', :connect_timeout => 0, :inactivity_timeout => 0).get
+				# 	http.stream { |chunk| p chunk }
+				# 	back = proc{
+				# 		request_persistent(&blk)
+				# 	}
+				# 	http.callback &back
+				# 	http.errback &back
+				# end
+
+				# def receive_with_chunk
+				# 	EventMachine.run do
+				# 		request_persistent{
+				# 			puts "Loop again"
+				# 		}
+				# 	end
+				# end
+				get '/ck/sub' do
 					stream :keep_open do |out|
 						# 将连接保存起来
 						settings.connections << out
@@ -127,6 +155,8 @@ module Postman
 						end
 						ws.onmessage do |msg|
 							EM.next_tick { 
+								# TODO
+								# 接收以及发送的exchange要区分开
 								if @exchange
 									@exchange.publish msg, :routing_key => routing_key(user), :mandatory => false
 								end

@@ -1,9 +1,9 @@
 module Postman
 	module App
 		module Controller
-			class BlackBoard < ApplicationController
+			class Websocket < ApplicationController
 				get '/' do
-				  perb :index, :layout => :layout
+				  perb :index
 				end
 			end
 		end
