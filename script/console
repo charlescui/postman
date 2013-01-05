@@ -8,7 +8,8 @@ include Postman::App::Model
 
 require 'irb'
 require 'irb/completion'
+require "pry"
 
 require 'ruby-debug' if Postman.env == 'development'
 
-IRB.start
+binding.pry

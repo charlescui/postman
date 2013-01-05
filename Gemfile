@@ -21,6 +21,8 @@ group :production do
   
 end
 
+gem "pry"
+gem "pry-doc"
 gem "thin"
 gem "amqp"
 gem "json"

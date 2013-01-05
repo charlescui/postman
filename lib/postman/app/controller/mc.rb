@@ -1,3 +1,4 @@
+require "json"
 require 'sinatra-websocket'
 
 class String
@@ -15,11 +16,15 @@ module Postman
 			class Mc < ApplicationController
 				helpers do
 					def routing_key(user = nil)
-						"#{(user || current_user).name}.#{params[:key]}"
+						"#{(user || current_user).private_key}.#{params[:key]}"
 					end
 
 					def bind_routing_key(user = nil)
 						"#{routing_key(user)}.#"
+					end
+
+					def direct_routing_key(user = nil)
+						"#{(user || current_user).private_key}.#{(user || current_user).id}"
 					end
 
 					def uuid_queue_name(user = nil)
@@ -139,28 +144,39 @@ module Postman
 				# WebScoket模式
 				get '/websocket' do
 					halt not_found if !request.websocket?
-					user = current_user
 					request.websocket do |ws|
 						ws.onopen do
 							AMQP::Channel.new(::P::C.amqp) do |channel, open_ok|
-								@exchange = channel.fanout(exchange_name(user))
-								@queue_name = uuid_queue_name(user)
-								AMQP::Queue.new(channel, @queue_name, :auto_delete => true, :durable => true, :arguments => { "x-message-ttl" => user.ttl }) do |queue|
+								@exchange = channel.direct("websocket::exchange")
+								@queue_name = uuid_queue_name(current_user)
+								AMQP::Queue.new(channel, @queue_name, :auto_delete => true, :durable => true, :arguments => { "x-message-ttl" => current_user.ttl }) do |queue|
 									@queue = queue
-									@queue.bind(@exchange).subscribe do |payload|
+									@queue.bind(@exchange, :routing_key => direct_routing_key(current_user)).subscribe do |payload|
 										ws.send(payload)
 									end
 								end
 							end
 						end
 						ws.onmessage do |msg|
-							EM.next_tick { 
-								# TODO
-								# 接收以及发送的exchange要区分开
-								if @exchange
-									@exchange.publish msg, :routing_key => routing_key(user), :mandatory => false
+							if @exchange
+								begin
+									data = JSON.parse(msg)
+									if data.is_a?(Hash) and data["to"]
+										send_data_pack = {
+											:from => current_user.id, 
+											:content => data["content"]
+										}.to_json
+										# 多个接收人的情况
+										data["to"].split(',').each do |user|
+											EM.next_tick do
+												@exchange.publish send_data_pack, :routing_key => direct_routing_key(user), :mandatory => false if user
+											end
+										end
+									end
+								rescue Exception => e
+									raise e
 								end
-							}
+							end
 						end
 						ws.onclose do
 							@queue.delete if @queue
