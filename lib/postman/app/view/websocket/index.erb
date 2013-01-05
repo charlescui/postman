@@ -1,7 +1,13 @@
 <html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> 
+  </head>
   <body>
      <h1>Simple Echo & Chat Server</h1>
+     <h3>---<%= current_user.name %></h3>
      <form id="form">
+       <label for='to'>To:</label><input type="text" id="to" value="1234567890"></input>
+       <br/>
        <input type="text" id="input" value="send a message"></input>
      </form>
      <div id="msgs"></div>
@@ -14,20 +20,33 @@
           return function(msg){ el.innerHTML = msg + '<br />' + el.innerHTML; }
         }(document.getElementById('msgs'));
 
-        var ws       = new WebSocket('ws://' + window.location.host + '/mc/websocket');
+        var ws       = new WebSocket('ws://' + window.location.host + '/mc/websocket?user_credentials='+'<%=current_user.credentials%>');
         ws.onopen    = function()  { show('websocket opened'); };
         ws.onclose   = function()  { show('websocket closed'); }
-        ws.onmessage = function(m) { show('websocket message: ' +  m.data); };
+        ws.onmessage = function(m) { 
+          console.log(m);
+          var obj = JSON.parse(m.data);
+          show('来自: ' + obj.from + ' 内容: ' + obj.content);
+        };
 
         var sender = function(f){
           var input     = document.getElementById('input');
+          var to = document.getElementById('to');
           input.onclick = function(){ input.value = "" };
           f.onsubmit    = function(){
-            ws.send(input.value);
+            var data = {to : to.value, content : input.value};
+            ws.send(JSON.stringify(data));
             input.value = "send a message";
             return false;
           }
         }(document.getElementById('form'));
+
+        $("#form").bind('keyup',function(event) {  
+          if(event.keyCode==13){ 
+            console.log("submit with return.") 
+            $("#form").submit();  
+          }     
+        });   
       })();
     }
   </script>

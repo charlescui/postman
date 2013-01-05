@@ -27,8 +27,12 @@ module Postman
 
 					def require_user
 						unless current_user
-							raise RequireUserException, "No user found!!!"
+							halt "No user found!!!"
 						end
+					end
+
+					def require_websocket
+						halt not_found if !request.websocket?
 					end
 
 	    			# 重定义erb模板方法，默认带上全局统一的模板文件
@@ -39,7 +43,7 @@ module Postman
 	    			end
 				end
 
-				dir = File.dirname(File.expand_path(__FILE__))
+				dir = File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', '..')
 				# 设置视图文件目录
     			BASEVIEWPATH = "#{dir}/postman/app/view"
     			set :views, BASEVIEWPATH

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require "json"
 require 'sinatra-websocket'
 
@@ -143,7 +145,8 @@ module Postman
 
 				# WebScoket模式
 				get '/websocket' do
-					halt not_found if !request.websocket?
+					require_user
+					require_websocket
 					request.websocket do |ws|
 						ws.onopen do
 							AMQP::Channel.new(::P::C.amqp) do |channel, open_ok|
@@ -152,6 +155,9 @@ module Postman
 								AMQP::Queue.new(channel, @queue_name, :auto_delete => true, :durable => true, :arguments => { "x-message-ttl" => current_user.ttl }) do |queue|
 									@queue = queue
 									@queue.bind(@exchange, :routing_key => direct_routing_key(current_user)).subscribe do |payload|
+										# em-webcosket要求数据必须负责utf-8编码
+										# 否则服务主动抛错
+										payload.force_encoding("UTF-8") if payload.respond_to?(:force_encoding)
 										ws.send(payload)
 									end
 								end
@@ -167,8 +173,9 @@ module Postman
 											:content => data["content"]
 										}.to_json
 										# 多个接收人的情况
-										data["to"].split(',').each do |user|
+										data["to"].split(',').each do |uid|
 											EM.next_tick do
+												user = User.find(uid)
 												@exchange.publish send_data_pack, :routing_key => direct_routing_key(user), :mandatory => false if user
 											end
 										end
