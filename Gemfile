@@ -29,6 +29,7 @@ gem "json"
 gem 'uuid'
 gem "redis"
 gem 'virtus'
+gem "maruku"
 gem "hiredis"
 gem "sinatra"
 gem "better_errors"

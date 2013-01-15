@@ -41,18 +41,22 @@ module Postman
 	    				options = {:layout => (@@_layout ||= IO.read(settings.layout))}.merge options
 	    				erb(template, options, locals)
 	    			end
+
+	    			def read_me
+	    				@@_read_me ||= IO.read(File.join(BASEPATH,'..','README.md'))
+	    			end
 				end
 
-				dir = File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', '..')
+				BASEPATH = File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', '..')
 				# 设置视图文件目录
-    			BASEVIEWPATH = "#{dir}/postman/app/view"
+    			BASEVIEWPATH = "#{BASEPATH}/postman/app/view"
     			set :views, BASEVIEWPATH
     			set :layout, File.join(BASEVIEWPATH, 'layout.erb')
 				
 				if respond_to? :public_folder
-					set :public_folder, "#{dir}/../public"
+					set :public_folder, "#{BASEPATH}/../public"
 				else
-					set :public, "#{dir}/../public"
+					set :public, "#{BASEPATH}/../public"
 				end
 				set :static, true
 
@@ -73,6 +77,10 @@ module Postman
 
 				error do
 			    	perb :"500", :views => BASEVIEWPATH
+				end
+
+				get	'/' do
+					Maruku.new(read_me).to_html
 				end
 			end#ApplicationController
 		end
