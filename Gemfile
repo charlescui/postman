@@ -29,9 +29,9 @@ gem "json"
 gem 'uuid'
 gem "redis"
 gem 'virtus'
-gem "maruku"
 gem "hiredis"
 gem "sinatra"
+gem "kramdown"
 gem "better_errors"
 gem "eventmachine"
 gem "activesupport"

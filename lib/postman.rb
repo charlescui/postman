@@ -1,7 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
 require "uuid"
-require 'maruku'
+require 'kramdown'
 require 'ostruct'
 require "sinatra/base"
 require "sinatra/reloader"

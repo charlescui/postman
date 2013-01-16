@@ -80,7 +80,7 @@ module Postman
 				end
 
 				get	'/' do
-					Maruku.new(read_me).to_html
+					@@_read_html ||= Kramdown::Document.new(read_me).to_html
 				end
 			end#ApplicationController
 		end
